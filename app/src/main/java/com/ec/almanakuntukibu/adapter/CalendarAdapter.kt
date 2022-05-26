@@ -1,14 +1,11 @@
 package com.ec.almanakuntukibu.adapter
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
-import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -16,16 +13,15 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.ec.almanakuntukibu.DBHelper
 import com.ec.almanakuntukibu.R
 import com.ec.almanakuntukibu.model.CycleModel
-import com.ec.almanakuntukibu.receiver.AlarmReceiver
-import com.ec.almanakuntukibu.ui.siklus.SiklusActivity
+import com.ec.almanakuntukibu.controller.siklus.SiklusActivity
+import com.ec.almanakuntukibu.utils.AlarmUtils
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class CalendarAdapter(context: Context, days: ArrayList<Date>, private val current: Calendar, private val cycles: ArrayList<CycleModel>) :
     ArrayAdapter<Date>(context, R.layout.calendar_day, days) {
@@ -89,6 +85,8 @@ class CalendarAdapter(context: Context, days: ArrayList<Date>, private val curre
 
     @SuppressLint("Range")
     private fun loadCycles(date: Date) {
+        if (alarm == 0) AlarmUtils(context).unsetAlarm()
+
         var count = 0
         var totalDiff = 0
         var prevCycle = Date()
@@ -105,7 +103,7 @@ class CalendarAdapter(context: Context, days: ArrayList<Date>, private val curre
             if (cycle.sta <= dbFormatter.format(date).toInt() && cycle.end >= dbFormatter.format(date).toInt()) {
                 textView.background = ContextCompat.getDrawable(context, R.drawable.bg_circle_pink)
                 textView.setTextColor(ContextCompat.getColor(context, R.color.ic_white))
-                linearLayout.background = ContextCompat.getDrawable(context, R.drawable.bg_corner_white)
+                linearLayout.background = ContextCompat.getDrawable(context, android.R.color.transparent)
                 linearLayout.setOnClickListener {
                     updCycleDialog(cycle.id, dbFormatter.parse(cycle.sta.toString())!!, dbFormatter.parse(cycle.end.toString())!!)
                 }
@@ -128,16 +126,16 @@ class CalendarAdapter(context: Context, days: ArrayList<Date>, private val curre
 
             if (i+1 == cycles.size) {
                 val nextCycle = Calendar.getInstance()
-                nextCycle.set(getDatePart("yyyy", dateSta), getDatePart("MM", dateSta)-1, getDatePart("dd", dateSta))
+                nextCycle.set(getDatePart("yyyy", dateSta), getDatePart("MM", dateSta)-1, getDatePart("dd", dateSta), 7, 0)
                 nextCycle.add(Calendar.DATE, avgDiff)
                 if (alarm == 0) {
-                    setAlarm(nextCycle)
+                    AlarmUtils(context).setAlarm(nextCycle, "0", "Jangan lupa untuk mendata siklus berikutnya. :)")
                     alarm = 1
                 }
                 if (dbFormatter.format(date) == dbFormatter.format(nextCycle.time)) {
                     textView.background = ContextCompat.getDrawable(context, R.drawable.bg_circle_grey)
                     textView.setTextColor(ContextCompat.getColor(context, R.color.ic_white))
-                    linearLayout.background = ContextCompat.getDrawable(context, R.drawable.bg_corner_white)
+                    linearLayout.background = ContextCompat.getDrawable(context, android.R.color.transparent)
                 }
             }
         }
@@ -199,17 +197,8 @@ class CalendarAdapter(context: Context, days: ArrayList<Date>, private val curre
         builder.show()
     }
 
-    private fun setAlarm(date: Calendar) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        intent.putExtra("text", "test")
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, date.timeInMillis, 60*1000, pendingIntent)
-        Toast.makeText(context, "Alarm is set on " + SimpleDateFormat("yyyy MM dd, HH:mm").format(date.time), Toast.LENGTH_SHORT).show()
-    }
-
     private fun restartActivity() {
-        context.sendBroadcast(Intent("finish"))
+        context.sendBroadcast(Intent("finish sm"))
         val intent = Intent(context, SiklusActivity::class.java)
         intent.putExtra("current", dbFormatter.format(current.time))
         context.startActivity(intent)

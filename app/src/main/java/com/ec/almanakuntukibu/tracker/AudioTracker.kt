@@ -8,6 +8,13 @@ import android.media.RingtoneManager
 class AudioTracker {
     private var mediaPlayer: MediaPlayer = MediaPlayer()
 
+    companion object {
+        private var instance: AudioTracker? = null
+        val getMediaPlayerInstance = {
+            instance ?: AudioTracker().also { instance = it }
+        }
+    }
+
     fun startAudio(context: Context) {
         var alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         if (alarmUri == null) {
@@ -15,6 +22,7 @@ class AudioTracker {
         }
         // alarmUri = Uri.parse("android.resource://" + context.packageName + "/" + R.raw.message_tone_meloboom)
 
+        mediaPlayer = MediaPlayer()
         mediaPlayer.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
         mediaPlayer.setDataSource(context, alarmUri)
         mediaPlayer.prepare()

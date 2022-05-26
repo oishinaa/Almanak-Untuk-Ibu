@@ -1,7 +1,10 @@
-package com.ec.almanakuntukibu.ui.nifas
+package com.ec.almanakuntukibu.controller.kehamilan
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -12,7 +15,7 @@ import com.ec.almanakuntukibu.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-class HlActivity: BaseActivity() {
+class HplActivity: BaseActivity() {
     private lateinit var btn: Button
     private lateinit var txtMonth: TextView
     private lateinit var txtDate: TextView
@@ -22,15 +25,15 @@ class HlActivity: BaseActivity() {
     private val db = DBHelper(this, null)
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        loadHl(2)
+        loadHpl(2)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_hl)
+        setContentView(R.layout.activity_hpl)
 
         val actionBar = supportActionBar
-        actionBar!!.title = "Masa Nifas"
+        actionBar!!.title = "Kehamilan"
         actionBar.setDisplayHomeAsUpEnabled(true)
 
         btn = findViewById(R.id.btn)
@@ -39,17 +42,27 @@ class HlActivity: BaseActivity() {
         txtYear = findViewById(R.id.txtYear)
         txtInfo = findViewById(R.id.txtInfo)
 
-        loadHl(1)
+        val broadcastReceiver = object: BroadcastReceiver() {
+            override fun onReceive(arg0: Context, intent: Intent) {
+                val action = intent.action
+                if (action == "finish hpl") {
+                    finish()
+                }
+            }
+        }
+        registerReceiver(broadcastReceiver, IntentFilter("finish hpl"))
 
-        btn.setOnClickListener { startForResult.launch(Intent(this, NifasActivity::class.java)) }
+        loadHpl(1)
+
+        btn.setOnClickListener { startActivity(Intent(this, KehamilanActivity::class.java)) }
     }
 
     @SuppressLint("Range")
-    private fun loadHl(type: Int) {
+    private fun loadHpl(type: Int) {
         val result = db.getUser()
         if (result != null) {
-            if (result.moveToFirst() && result.getInt(result.getColumnIndex(DBHelper.user_hl)) != 0) {
-                val date = dbFormatter.parse(result.getInt(result.getColumnIndex(DBHelper.user_hl)).toString())
+            if (result.moveToFirst() && result.getInt(result.getColumnIndex(DBHelper.user_hpl)) != 0) {
+                val date = dbFormatter.parse(result.getInt(result.getColumnIndex(DBHelper.user_hpl)).toString())
                 txtMonth.text = sMonths[getDatePart("MM", date!!)-1]
                 txtDate.text = SimpleDateFormat("dd", Locale.UK).format(date)
                 txtYear.text = SimpleDateFormat("yyyy", Locale.UK).format(date)
@@ -60,12 +73,12 @@ class HlActivity: BaseActivity() {
                 hpht.add(Calendar.DATE, -7)
 
                 val dateDiff = kotlin.math.abs(Date().time - hpht.timeInMillis) / (24 * 60 * 60 * 1000)
-                val day = dateDiff.toString()
-                val info = "Sekarang anda berada di hari ke-$day masa nifas"
+                val week = ((dateDiff / 7) + 1).toString()
+                val info = "Sekarang anda berada di minggu ke-$week kehamilan"
                 txtInfo.text = info
             } else {
                 if (type == 1)
-                    startForResult.launch(Intent(this, HlFormActivity::class.java))
+                    startForResult.launch(Intent(this, HplFormActivity::class.java))
                 else {
                     finish()
                 }

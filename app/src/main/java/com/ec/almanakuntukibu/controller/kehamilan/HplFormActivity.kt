@@ -1,4 +1,4 @@
-package com.ec.almanakuntukibu.ui.kehamilan
+package com.ec.almanakuntukibu.controller.kehamilan
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -56,8 +56,8 @@ class HplFormActivity: BaseActivity() {
 
         btnSudahTauHpl.setOnClickListener { toggleBtnSudah() }
         btnBelumTauHpl.setOnClickListener { toggleBtnBelum() }
-        lnlHpl.setOnClickListener { showDatePickerDialog(onHplSetListener) }
-        lnlHpht.setOnClickListener { showDatePickerDialog(onHphtSetListener) }
+        lnlHpl.setOnClickListener { showDatePickerDialog(onHplSetListener, null) }
+        lnlHpht.setOnClickListener { showDatePickerDialog(onHphtSetListener, date) }
         btn.setOnClickListener{ submit() }
     }
 
@@ -96,23 +96,27 @@ class HplFormActivity: BaseActivity() {
     }
 
     private fun submit() {
-        if (lnlHpl.visibility == View.VISIBLE) {
-            val result = db.getUser()
-            if (result != null) {
-                if (!result.moveToFirst()) db.addUser("hpl", dbFormatter.format(date.time).toInt())
-                else db.updUser("hpl", dbFormatter.format(date.time).toInt())
-            }
-        } else {
-            val tempDate = Calendar.getInstance()
-            tempDate.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE))
-            tempDate.add(Calendar.DATE, 7)
-            tempDate.add(Calendar.MONTH, 9)
+        if (lnlHpht.visibility == View.VISIBLE) {
+            date.add(Calendar.DATE, 7)
+            date.add(Calendar.MONTH, 9)
+        }
+        val result = db.getUser()
+        if (result != null) {
+            if (!result.moveToFirst()) db.addUser("hpl", dbFormatter.format(date.time).toInt())
+            else db.updUser("hpl", dbFormatter.format(date.time).toInt())
+        }
+        addVisits()
+    }
 
-            val result = db.getUser()
-            if (result != null) {
-                if (!result.moveToFirst()) db.addUser("hpl", dbFormatter.format(tempDate.time).toInt())
-                else db.updUser("hpl", dbFormatter.format(tempDate.time).toInt())
-            }
+    private fun addVisits() {
+        val weeks = arrayOf(13, 17, 21, 25, 31, 37)
+        date.add(Calendar.MONTH, -9)
+        date.add(Calendar.DATE, -7)
+        for (w in weeks) {
+            val visitDate = Calendar.getInstance()
+            visitDate.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE))
+            visitDate.add(Calendar.DATE, (w-1)*7)
+            db.addVisit(1, dbFormatter.format(visitDate.time).toInt(), "07:00", "", 0)
         }
         finish()
     }

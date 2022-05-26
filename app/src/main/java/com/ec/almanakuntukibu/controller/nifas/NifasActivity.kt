@@ -1,4 +1,4 @@
-package com.ec.almanakuntukibu.ui.nifas
+package com.ec.almanakuntukibu.controller.nifas
 
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager

@@ -1,4 +1,4 @@
-package com.ec.almanakuntukibu.ui.siklus
+package com.ec.almanakuntukibu.controller.siklus
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -13,6 +13,9 @@ import com.ec.almanakuntukibu.DBHelper
 import com.ec.almanakuntukibu.R
 import com.ec.almanakuntukibu.adapter.CalendarAdapter
 import com.ec.almanakuntukibu.model.CycleModel
+import com.ec.almanakuntukibu.tracker.AudioTracker
+import com.ec.almanakuntukibu.utils.AlarmUtils
+import com.ec.almanakuntukibu.utils.NotificationUtils
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -42,12 +45,15 @@ class SiklusActivity: BaseActivity() {
         val broadcastReceiver = object: BroadcastReceiver() {
             override fun onReceive(arg0: Context, intent: Intent) {
                 val action = intent.action
-                if (action == "finish") {
+                if (action == "finish sm") {
                     finish()
                 }
             }
         }
-        registerReceiver(broadcastReceiver, IntentFilter("finish"))
+        registerReceiver(broadcastReceiver, IntentFilter("finish sm"))
+
+        AudioTracker.getMediaPlayerInstance().stopAudio()
+        NotificationUtils(this).getManager().cancel(2)
 
         /* val result = db.getCycles()
         if (result != null) {

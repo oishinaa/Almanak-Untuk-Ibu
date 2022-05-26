@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.siklus.SiklusFormActivity">
+    tools:context=".controller.siklus.SiklusFormActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:padding="25dp"
-                android:background="@drawable/bg_corner_white"
+                android:background="@drawable/bg_corner_pink"
                 android:elevation="2.5dp"
                 android:orientation="vertical">
 

@@ -5,7 +5,7 @@ class VisitModel {
     var date = 0
     var time = ""
     var notes = ""
-    var status = 0
+    var status = false
     var now = false
     var desc = ""
 }

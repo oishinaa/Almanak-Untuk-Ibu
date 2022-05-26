@@ -1,4 +1,4 @@
-package com.ec.almanakuntukibu.ui.nifas
+package com.ec.almanakuntukibu.controller.nifas
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -37,7 +37,7 @@ class HlFormActivity: BaseActivity() {
         txtHl = findViewById(R.id.txtHl)
         btn = findViewById(R.id.btn)
 
-        lnlHl.setOnClickListener { showDatePickerDialog(onHlSetListener) }
+        lnlHl.setOnClickListener { showDatePickerDialog(onHlSetListener, null) }
         btn.setOnClickListener{ submit() }
     }
 

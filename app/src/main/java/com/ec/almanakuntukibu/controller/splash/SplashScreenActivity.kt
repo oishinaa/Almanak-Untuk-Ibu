@@ -1,4 +1,4 @@
-package com.ec.almanakuntukibu.ui
+package com.ec.almanakuntukibu.controller.splash
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.WindowManager
-import com.ec.almanakuntukibu.MainActivity
 import com.ec.almanakuntukibu.R
 
 @Suppress("DEPRECATION")
@@ -22,7 +21,7 @@ class SplashScreenActivity: AppCompatActivity() {
         )
 
         Handler().postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, GreetingActivity::class.java))
             finish()
         }, 3000)
     }

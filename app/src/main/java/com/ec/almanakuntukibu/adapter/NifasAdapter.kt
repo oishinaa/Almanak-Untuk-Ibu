@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.ec.almanakuntukibu.R
 import com.ec.almanakuntukibu.model.VisitModel
-import com.ec.almanakuntukibu.ui.nifas.NifasActivity
+import com.ec.almanakuntukibu.controller.nifas.NifasActivity
 
 class NifasAdapter(context: NifasActivity, private var items: ArrayList<VisitModel>) :
     RecyclerView.Adapter<NifasAdapter.ViewHolder>() {

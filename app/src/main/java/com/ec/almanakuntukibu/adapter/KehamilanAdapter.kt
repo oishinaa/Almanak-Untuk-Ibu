@@ -18,7 +18,7 @@ import com.ec.almanakuntukibu.receiver.AlarmReceiver
 import com.ec.almanakuntukibu.DBHelper
 import com.ec.almanakuntukibu.R
 import com.ec.almanakuntukibu.model.VisitModel
-import com.ec.almanakuntukibu.ui.kehamilan.KehamilanActivity
+import com.ec.almanakuntukibu.controller.kehamilan.KehamilanActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,12 +26,13 @@ import java.util.*
 class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<VisitModel>) :
     RecyclerView.Adapter<KehamilanAdapter.ViewHolder>() {
 
-    private lateinit var txtPassword: EditText
+    private lateinit var edtPassword: EditText
     private lateinit var imgShow: ImageView
     private lateinit var imgHide: ImageView
     private lateinit var lnlDate: LinearLayout
     private lateinit var txtDate: TextView
-    private lateinit var txtNotes: EditText
+    private lateinit var edtNotes: EditText
+    private lateinit var chkStatus: CheckBox
     private lateinit var date: Calendar
     private var _year = 0
     private var _month = 0
@@ -74,41 +75,44 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
         holder.lnlBlankSta.visibility = if (position == 0) View.VISIBLE else View.GONE
         holder.txtHeader.text = if (no == 1) "Trimester I" else if (no == 14) "Trimester II" else if (no == 27) "Trimester III" else ""
         holder.txtNo.text = no.toString()
-        holder.txtNo.background = if (item.now) ContextCompat.getDrawable(context, R.drawable.bg_circle_pink) else ContextCompat.getDrawable(context, android.R.color.transparent)
+        holder.txtNo.background = ContextCompat.getDrawable(context, if (item.now) R.drawable.bg_circle_pink else android.R.color.transparent)
         holder.txtNo.setTextColor(ContextCompat.getColor(context, if (item.now) R.color.ic_white else R.color.dark))
         holder.txtKeterangan.text = item.desc
         holder.txtKeterangan.visibility = if (item.desc == "") View.GONE else View.VISIBLE
         holder.lnlLine.visibility = if (no == 13 || no == 26) View.VISIBLE else View.GONE
         holder.lnlBlankEnd.visibility = if (position+1 == items.size) View.VISIBLE else View.GONE
+
         if (item.desc != "") {
+            holder.txtKeterangan.setTextColor(ContextCompat.getColor(context, if (item.status) R.color.dark else R.color.ic_white))
+            holder.txtKeterangan.background = ContextCompat.getDrawable(context, if (item.status) R.drawable.bg_corner_grey else R.drawable.bg_corner_pink)
             holder.txtKeterangan.setOnClickListener {
                 val dialogLayout = LayoutInflater.from(context).inflate(R.layout.dialog_isi_password, null)
-                txtPassword = dialogLayout.findViewById(R.id.txtPassword)
+                edtPassword = dialogLayout.findViewById(R.id.edtPassword)
                 imgShow = dialogLayout.findViewById(R.id.imgShow)
                 imgHide = dialogLayout.findViewById(R.id.imgHide)
-                txtPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                edtPassword.transformationMethod = PasswordTransformationMethod.getInstance()
 
                 imgShow.setOnClickListener {
-                    txtPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                    edtPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
                     imgHide.visibility = View.VISIBLE
                     imgShow.visibility = View.GONE
                 }
                 imgHide.setOnClickListener {
-                    txtPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                    edtPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                     imgShow.visibility = View.VISIBLE
                     imgHide.visibility = View.GONE
                 }
 
                 val builder = AlertDialog.Builder(context)
                 builder.setView(dialogLayout)
-                builder.setPositiveButton("Oke") { _,_ -> submitPassword(txtPassword.text.toString(), item.id, item.date, item.time, item.notes) }
+                builder.setPositiveButton("Oke") { _,_ -> submitPassword(edtPassword.text.toString(), item.id, item.date, item.time, item.notes, item.status) }
                 builder.setNegativeButton("Batal") { _,_ -> }
                 builder.show()
             }
         }
     }
 
-    private fun submitPassword(text: String, id: Int, visit_date: Int, visit_time: String, visit_notes: String) {
+    private fun submitPassword(text: String, id: Int, visit_date: Int, visit_time: String, visit_notes: String, visit_status: Boolean) {
         if (text == "bidannganjuk") {
             val tempDate = dbFormatter.parse(visit_date.toString())
             val tempTime = tmFormatter.parse(visit_time)
@@ -118,16 +122,18 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
             val dialogLayout = LayoutInflater.from(context).inflate(R.layout.dialog_buat_alarm, null)
             lnlDate = dialogLayout.findViewById(R.id.lnlDate)
             txtDate = dialogLayout.findViewById(R.id.txtDate)
-            txtNotes = dialogLayout.findViewById(R.id.txtNotes)
-            txtDate.text = dtFormatter(date.time)
-            txtNotes.text = Editable.Factory.getInstance().newEditable(visit_notes)
-
+            edtNotes = dialogLayout.findViewById(R.id.edtNotes)
+            chkStatus = dialogLayout.findViewById(R.id.chkStatus)
             lnlDate.setOnClickListener { showDatePickerDialog(onDateSetListener) }
+
+            txtDate.text = dtFormatter(date.time)
+            edtNotes.text = Editable.Factory.getInstance().newEditable(visit_notes)
+            chkStatus.isChecked = visit_status
 
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Ubah Pengingat Kunjungan")
             builder.setView(dialogLayout)
-            builder.setPositiveButton("Oke") { _,_ -> setAlarm(date); db.updVisit(id,1, dbFormatter.format(date.time).toInt(), tmFormatter.format(date.time), txtNotes.text.toString(), 0); restartActivity() }
+            builder.setPositiveButton("Oke") { _,_ -> db.updVisit(id,1, dbFormatter.format(date.time).toInt(), tmFormatter.format(date.time), edtNotes.text.toString(), if (chkStatus.isChecked) 1 else 0); restartActivity() }
             builder.setNegativeButton("Batal") { _,_ -> }
             builder.show()
         } else {
@@ -138,16 +144,8 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
         }
     }
 
-    private fun setAlarm(date: Calendar) {
-        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, (0..2147483647).random(), intent, PendingIntent.FLAG_UPDATE_CURRENT or if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0)
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, date.timeInMillis, pendingIntent)
-        Toast.makeText(context, "Alarm is set", Toast.LENGTH_SHORT).show()
-    }
-
     private fun restartActivity() {
-        context.sendBroadcast(Intent("finish"))
+        context.sendBroadcast(Intent("finish kk"))
         context.startActivity(Intent(context, KehamilanActivity::class.java))
     }
 

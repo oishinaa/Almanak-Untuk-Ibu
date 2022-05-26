@@ -159,4 +159,10 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         db.delete(visits, "$visit_id = ?", Array(1) { id.toString() })
         db.close()
     }
+
+    fun delAllVisits(type: Int) {
+        val db = this.writableDatabase
+        db.delete(visits, "$visit_type = ?", Array(1) { type.toString() })
+        db.close()
+    }
 }

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/logo_bg_notext"
@@ -19,43 +20,52 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".receiver.AlarmReceiver"
             android:enabled="true"
             android:exported="false" />
+        <receiver
+            android:name=".receiver.SnoozeReceiver"
+            android:enabled="true"
+            android:exported="false" />
         <service
             android:name=".service.EndlessService"
             android:enabled="true"
             android:exported="false" />
+
         <activity
-            android:name=".ui.nifas.NifasActivity"
+            android:name=".controller.nifas.NifasActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.nifas.HlActivity"
+            android:name=".controller.nifas.HlActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.nifas.HlFormActivity"
+            android:name=".controller.nifas.HlFormActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.kehamilan.KehamilanActivity"
+            android:name=".controller.kehamilan.KehamilanActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.kehamilan.HplActivity"
+            android:name=".controller.kehamilan.HplActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.kehamilan.HplFormActivity"
+            android:name=".controller.kehamilan.HplFormActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.siklus.SiklusFormActivity"
+            android:name=".controller.siklus.SiklusFormActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.siklus.SiklusActivity"
+            android:name=".controller.siklus.SiklusActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.SplashScreenActivity"
+            android:name=".controller.splash.GreetingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".controller.splash.SplashScreenActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>

@@ -1,4 +1,4 @@
-package com.ec.almanakuntukibu.ui.siklus
+package com.ec.almanakuntukibu.controller.siklus
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -38,10 +38,10 @@ class SiklusFormActivity: BaseActivity() {
         actionBar.setDisplayHomeAsUpEnabled(true)
 
         lnlTl.setOnClickListener {
-            showDatePickerDialog(onTlSetListener)
+            showDatePickerDialog(onTlSetListener, null)
         }
         lnlHpht.setOnClickListener {
-            showDatePickerDialog(onHphtSetListener)
+            showDatePickerDialog(onHphtSetListener, null)
         }
     }
 }
