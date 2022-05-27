@@ -46,10 +46,10 @@ class NotificationUtils(base: Context): ContextWrapper(base) {
         val intent: Intent
         val icon: Int
         if (type == "0") {
-            intent = Intent(this, SiklusActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TASK }
+            intent = Intent(this, SiklusActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP }
             icon = R.drawable.ic_water_drop
         } else {
-            intent = Intent(this, KehamilanActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TASK }
+            intent = Intent(this, KehamilanActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TOP }
             icon = R.drawable.ic_pregnancy
         }
 

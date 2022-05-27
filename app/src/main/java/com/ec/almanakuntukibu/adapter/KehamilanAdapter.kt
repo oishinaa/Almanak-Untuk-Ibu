@@ -135,6 +135,7 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
             builder.setView(dialogLayout)
             builder.setPositiveButton("Oke") { _,_ -> db.updVisit(id,1, dbFormatter.format(date.time).toInt(), tmFormatter.format(date.time), edtNotes.text.toString(), if (chkStatus.isChecked) 1 else 0); restartActivity() }
             builder.setNegativeButton("Batal") { _,_ -> }
+            builder.setNeutralButton("Hapus") { _,_ -> db.delVisit(id); restartActivity() }
             builder.show()
         } else {
             val builder = AlertDialog.Builder(context)

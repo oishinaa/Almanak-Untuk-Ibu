@@ -34,7 +34,6 @@ class MainActivity: BaseActivity() {
         btnMasaNifas = findViewById(R.id.btnMasaNifas)
 
         loadBtn()
-        ServiceTracker().actionOnService(this, "start")
     }
 
     @SuppressLint("Range")

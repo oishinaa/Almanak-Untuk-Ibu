@@ -1,5 +1,6 @@
 package com.ec.almanakuntukibu.service
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -12,10 +13,18 @@ import android.widget.Toast
 import com.ec.almanakuntukibu.*
 import com.ec.almanakuntukibu.enum.State
 import com.ec.almanakuntukibu.tracker.ServiceTracker
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EndlessService: Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
+    private val getDatePart = { pattern: String, date: Date -> SimpleDateFormat(pattern, Locale.UK).format(date).toInt() }
+    private val sMonths = arrayOf("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des")
+    private val dbFormatter = SimpleDateFormat("yyyyMMdd", Locale.UK)
+    private val dtFormatter = { date: Date -> dpFormatter(date) + " " + tmFormatter.format(date) }
+    private val tmFormatter = SimpleDateFormat("HH:mm", Locale.UK)
+    private val dpFormatter = { date: Date -> getDatePart("dd", date).toString() + " " + sMonths[getDatePart("MM", date)-1] + " " + getDatePart("yyyy", date) }
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -44,7 +53,8 @@ class EndlessService: Service() {
 
     private fun startService() {
         if (isServiceStarted) return
-        Toast.makeText(this, "Service starting its task", Toast.LENGTH_SHORT).show()
+        val alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        Toast.makeText(this, "" + alarmManager.nextAlarmClock?.toString(), Toast.LENGTH_SHORT).show()
         isServiceStarted = true
         ServiceTracker().setServiceState(this, State.STARTED.name)
 
@@ -57,12 +67,10 @@ class EndlessService: Service() {
     }
 
     private fun stopService() {
-        Toast.makeText(this, "Service stopping", Toast.LENGTH_SHORT).show()
+        // Toast.makeText(this, "Service stopping", Toast.LENGTH_SHORT).show()
         try {
             wakeLock?.let {
-                if (it.isHeld) {
-                    it.release()
-                }
+                if (it.isHeld) it.release()
             }
             stopForeground(true)
             stopSelf()
@@ -83,6 +91,7 @@ class EndlessService: Service() {
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000, restartServicePendingIntent)
     }
 
+    @SuppressLint("Range")
     private fun createNotification(): Notification {
         val notificationChannelId = "ENDLESS SERVICE CHANNEL"
 
@@ -114,9 +123,23 @@ class EndlessService: Service() {
             notificationChannelId
         ) else Notification.Builder(this)
 
+        var alarm = ""
+        val db = DBHelper(this, null)
+        val result = db.getAlarm()
+        if (result != null) {
+            if (result.moveToFirst()) {
+                val tempDate = dbFormatter.parse(result.getInt(result.getColumnIndex(DBHelper.alarm_date)).toString())
+                val tempTime = tmFormatter.parse(result.getString(result.getColumnIndex(DBHelper.alarm_time)))
+
+                val clnd = Calendar.getInstance()
+                clnd.set(getDatePart("yyyy", tempDate!!), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime))
+                alarm = dtFormatter(clnd.time)
+            }
+        }
+
         return builder
-            .setContentTitle("Endless Service")
-            .setContentText("This is your favorite endless service working")
+            .setContentTitle("Info")
+            .setContentText("Alarm berikutnya akan berbunyi pada $alarm")
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setTicker("Ticker text")

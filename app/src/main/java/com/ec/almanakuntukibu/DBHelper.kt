@@ -30,14 +30,19 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         const val visit_time = "time"
         const val visit_notes = "notes"
         const val visit_status = "status"
+
+        const val alarm = "alarm"
+        const val alarm_id = "id"
+        const val alarm_date = "date"
+        const val alarm_time = "time"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("DROP TABLE IF EXISTS $user")
         val qUser = ("CREATE TABLE $user (" +
-                "$user_id INTEGER PRIMARY KEY, " +
-                "$user_hpl INTEGER," +
-                "$user_hl INTEGER" + ")")
+            "$user_id INTEGER PRIMARY KEY, " +
+            "$user_hpl INTEGER," +
+            "$user_hl INTEGER" + ")")
         db.execSQL(qUser)
 
         db.execSQL("DROP TABLE IF EXISTS $cycles")
@@ -49,13 +54,20 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
 
         db.execSQL("DROP TABLE IF EXISTS $visits")
         val qVisits = ("CREATE TABLE $visits (" +
-                "$visit_id INTEGER PRIMARY KEY, " +
-                "$visit_type INTEGER, " +
-                "$visit_date INTEGER, " +
-                "$visit_time TEXT, " +
-                "$visit_notes TEXT, " +
-                "$visit_status INTEGER" + ")")
+            "$visit_id INTEGER PRIMARY KEY, " +
+            "$visit_type INTEGER, " +
+            "$visit_date INTEGER, " +
+            "$visit_time TEXT, " +
+            "$visit_notes TEXT, " +
+            "$visit_status INTEGER" + ")")
         db.execSQL(qVisits)
+
+        db.execSQL("DROP TABLE IF EXISTS $alarm")
+        val qAlarm = ("CREATE TABLE $alarm (" +
+            "$alarm_id INTEGER PRIMARY KEY, " +
+            "$alarm_date INTEGER, " +
+            "$alarm_time TEXT" + ")")
+        db.execSQL(qAlarm)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
@@ -84,6 +96,29 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         val values = ContentValues()
         values.put(if (col == "hpl") user_hpl else user_hl, value)
         db.update(user, values, "$user_id = ?", Array(1) { "1" })
+        db.close()
+    }
+
+    fun getAlarm(): Cursor? {
+        val db = this.readableDatabase
+        return db.rawQuery("SELECT * FROM $alarm", null)
+    }
+
+    fun addAlarm(date: Int, time: String) {
+        val db = this.readableDatabase
+        val values = ContentValues()
+        values.put(alarm_date, date)
+        values.put(alarm_time, time)
+        db.insert(alarm, null, values)
+        db.close()
+    }
+
+    fun updAlarm(date: Int, time: String) {
+        val db = this.readableDatabase
+        val values = ContentValues()
+        values.put(alarm_date, date)
+        values.put(alarm_time, time)
+        db.update(alarm, values, "$alarm_id = ?", Array(1) { "1" })
         db.close()
     }
 

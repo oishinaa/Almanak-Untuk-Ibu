@@ -5,8 +5,9 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 
+
 class AudioTracker {
-    private var mediaPlayer: MediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
 
     companion object {
         private var instance: AudioTracker? = null
@@ -22,15 +23,17 @@ class AudioTracker {
         }
         // alarmUri = Uri.parse("android.resource://" + context.packageName + "/" + R.raw.message_tone_meloboom)
 
-        mediaPlayer = MediaPlayer()
-        mediaPlayer.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
-        mediaPlayer.setDataSource(context, alarmUri)
-        mediaPlayer.prepare()
-        mediaPlayer.isLooping = true
-        mediaPlayer.start()
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer()
+        }
+        mediaPlayer?.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
+        mediaPlayer?.setDataSource(context, alarmUri)
+        mediaPlayer?.isLooping = true
+        mediaPlayer?.prepare()
+        mediaPlayer?.start()
     }
 
     fun stopAudio() {
-        mediaPlayer.stop()
+        mediaPlayer?.stop()
     }
 }

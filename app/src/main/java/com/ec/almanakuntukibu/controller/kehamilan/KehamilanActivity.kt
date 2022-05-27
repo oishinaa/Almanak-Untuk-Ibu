@@ -9,7 +9,6 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -20,6 +19,7 @@ import com.ec.almanakuntukibu.DBHelper
 import com.ec.almanakuntukibu.R
 import com.ec.almanakuntukibu.adapter.KehamilanAdapter
 import com.ec.almanakuntukibu.model.VisitModel
+import com.ec.almanakuntukibu.utils.AlarmUtils
 import java.util.*
 
 class KehamilanActivity: BaseActivity() {
@@ -125,6 +125,9 @@ class KehamilanActivity: BaseActivity() {
         val result = db.getVisits(1)
         val visits = ArrayList<VisitModel>()
         var count = 0
+        val alarmTime = Calendar.getInstance()
+        var alarmWeek = 0
+        var alarmSet = false
         for (i in 1 until 46) {
             val visit = VisitModel()
             visit.now = i == calculateWeek(Date())
@@ -136,7 +139,6 @@ class KehamilanActivity: BaseActivity() {
                         visit.time = result.getString(result.getColumnIndex(DBHelper.visit_time))
                         visit.notes = result.getString(result.getColumnIndex(DBHelper.visit_notes))
                         visit.status = result.getInt(result.getColumnIndex(DBHelper.visit_status)) != 0
-                        Log.v("visit", visit.id.toString() + " " + visit.date + " " + visit.status)
                         val tempDate = dbFormatter.parse(visit.date.toString())
                         val tempTime = tmFormatter.parse(visit.time)
                         val notes = if (visit.notes.isNotEmpty()) "\n" + visit.notes else ""
@@ -144,6 +146,12 @@ class KehamilanActivity: BaseActivity() {
                             val clnd = Calendar.getInstance()
                             clnd.set(getDatePart("yyyy", tempDate), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime))
                             val text = dtFormatter(clnd.time)
+
+                            if (!visit.status && Calendar.getInstance().timeInMillis >= visit.date) {
+                                alarmTime.set(getDatePart("yyyy", tempDate), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime))
+                                alarmWeek = i
+                                alarmSet = true
+                            }
 
                             count++
                             visit.desc = "K$count | $text $notes"
@@ -154,6 +162,7 @@ class KehamilanActivity: BaseActivity() {
             }
             visits.add(visit)
         }
+        if (alarmSet) AlarmUtils(this).setAlarm(alarmTime, "2", "Hari ini ada jadwal kunjungan kehamilan ke-$alarmWeek!")
         rcvKunjungan.adapter = KehamilanAdapter(this, visits)
     }
 
