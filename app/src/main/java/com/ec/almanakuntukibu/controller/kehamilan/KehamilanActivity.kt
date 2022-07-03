@@ -9,7 +9,6 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -112,7 +111,7 @@ class KehamilanActivity: BaseActivity() {
 
             val builder = AlertDialog.Builder(this)
             builder.setView(dialogLayout)
-            builder.setPositiveButton("Oke") { _, _ -> finishMonitoring() }
+            builder.setPositiveButton("Oke") { _, _ -> finishMonitoring(edtPassword.text.toString()) }
             builder.setNegativeButton("Batal") { _, _ -> }
             builder.show()
         }
@@ -187,14 +186,12 @@ class KehamilanActivity: BaseActivity() {
                             clnd.set(getDatePart("yyyy", tempDate), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime), 0)
                             val text = dtFormatter(clnd.time)
 
-                            if (!visit.status && clnd.timeInMillis > Date().time && !alarmSet) {
+                            if (!visit.status && (clnd.timeInMillis > Date().time || !result.moveToNext()) && !alarmSet) {
                                 val upcoming = if (count != 0 && !visits[weekBefore].status) count-1 else count
                                 val alarm = if (count != 0 && !visits[weekBefore].status) clndBefore else clnd
                                 alarmTime.set(alarm.get(Calendar.YEAR), alarm.get(Calendar.MONTH), alarm.get(Calendar.DATE), alarm.get(Calendar.HOUR_OF_DAY), alarm.get(Calendar.MINUTE), 0)
                                 alarmVisit = upcoming+1
                                 alarmSet = true
-
-                                Log.v("alarm", "$count $weekBefore" + visits[weekBefore].status.toString())
                             }
                             weekBefore = i-1
                             clndBefore.set(clnd.get(Calendar.YEAR), clnd.get(Calendar.MONTH), clnd.get(Calendar.DATE), clnd.get(Calendar.HOUR_OF_DAY), clnd.get(Calendar.MINUTE), 0)
@@ -243,12 +240,19 @@ class KehamilanActivity: BaseActivity() {
         }
     }
 
-    private fun finishMonitoring() {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage("Jika pemantauan kehamilan sudah selesai maka alarm & data kunjungan kehamilan akan dihapus. Selesaikan?")
-        builder.setPositiveButton("Oke") { _, _ ->db.updUser("hpl", 0); AlarmUtils(this).unsetAlarm(); db.delAllVisits(1); finish(); sendBroadcast(Intent("finish hpl")) }
-        builder.setNegativeButton("Batal") { _, _ -> }
-        builder.show()
+    private fun finishMonitoring(text: String) {
+        if (text == "nganjukbangkit") {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Jika pemantauan kehamilan sudah selesai maka alarm & data kunjungan kehamilan akan dihapus. Selesaikan?")
+            builder.setPositiveButton("Oke") { _, _ -> db.updUser("hpl", 0); AlarmUtils(this).unsetAlarm(); db.delAllVisits(1); finish(); sendBroadcast(Intent("finish hpl")) }
+            builder.setNegativeButton("Batal") { _, _ -> }
+            builder.show()
+        } else {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Password salah!")
+            builder.setPositiveButton("Oke") { _,_ -> }
+            builder.show()
+        }
     }
 
     private fun restartActivity() {

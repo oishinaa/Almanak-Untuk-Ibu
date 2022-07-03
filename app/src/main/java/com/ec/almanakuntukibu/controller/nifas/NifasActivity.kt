@@ -1,9 +1,7 @@
 package com.ec.almanakuntukibu.controller.nifas
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -113,7 +111,7 @@ class NifasActivity: BaseActivity() {
 
             val builder = AlertDialog.Builder(this)
             builder.setView(dialogLayout)
-            builder.setPositiveButton("Oke") { _, _ -> finishMonitoring() }
+            builder.setPositiveButton("Oke") { _, _ -> finishMonitoring(edtPassword.text.toString()) }
             builder.setNegativeButton("Batal") { _, _ -> }
             builder.show()
         }
@@ -159,12 +157,14 @@ class NifasActivity: BaseActivity() {
     private fun loadKunjungan() {
         rcvKunjungan.layoutManager = LinearLayoutManager(this)
         loadHl()
-        val result = db.getVisits(2)
-        val visits = ArrayList<VisitModel>()
         var count = 0
-        val alarmTime = Calendar.getInstance()
+        var weekBefore = 0
         var alarmVisit = 0
         var alarmSet = false
+        val clndBefore = Calendar.getInstance()
+        val alarmTime = Calendar.getInstance()
+        val visits = ArrayList<VisitModel>()
+        val result = db.getVisits(2)
         for (i in 1 until 43) {
             val visit = VisitModel()
             visit.now = i == calculateDay(Date())
@@ -184,11 +184,15 @@ class NifasActivity: BaseActivity() {
                             clnd.set(getDatePart("yyyy", tempDate), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime), 0)
                             val text = dtFormatter(clnd.time)
 
-                            if (!visit.status && clnd.timeInMillis > Date().time && !alarmSet) {
-                                alarmTime.set(getDatePart("yyyy", tempDate), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime), getDatePart("mm", tempTime), 0)
-                                alarmVisit = count+1
+                            if (!visit.status && (clnd.timeInMillis > Date().time || !result.moveToNext()) && !alarmSet) {
+                                val upcoming = if (count != 0 && !visits[weekBefore].status) count-1 else count
+                                val alarm = if (count != 0 && !visits[weekBefore].status) clndBefore else clnd
+                                alarmTime.set(alarm.get(Calendar.YEAR), alarm.get(Calendar.MONTH), alarm.get(Calendar.DATE), alarm.get(Calendar.HOUR_OF_DAY), alarm.get(Calendar.MINUTE), 0)
+                                alarmVisit = upcoming+1
                                 alarmSet = true
                             }
+                            weekBefore = i-1
+                            clndBefore.set(clnd.get(Calendar.YEAR), clnd.get(Calendar.MONTH), clnd.get(Calendar.DATE), clnd.get(Calendar.HOUR_OF_DAY), clnd.get(Calendar.MINUTE), 0)
 
                             count++
                             visit.desc = "$text$notes"
@@ -234,12 +238,19 @@ class NifasActivity: BaseActivity() {
         }
     }
 
-    private fun finishMonitoring() {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage("Jika pemantauan masa nifas sudah selesai maka alarm & data kunjungan masa nifas akan dihapus. Selesaikan?")
-        builder.setPositiveButton("Oke") { _, _ -> db.updUser("hl", 0); AlarmUtils(this).unsetAlarm(); db.delAllVisits(2); finish(); sendBroadcast(Intent("finish hl")) }
-        builder.setNegativeButton("Batal") { _, _ -> }
-        builder.show()
+    private fun finishMonitoring(text: String) {
+        if (text == "nganjukbangkit") {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Jika pemantauan masa nifas sudah selesai maka alarm & data kunjungan masa nifas akan dihapus. Selesaikan?")
+            builder.setPositiveButton("Oke") { _, _ -> db.updUser("hl", 0); AlarmUtils(this).unsetAlarm(); db.delAllVisits(2); finish(); sendBroadcast(Intent("finish hl")) }
+            builder.setNegativeButton("Batal") { _, _ -> }
+            builder.show()
+        } else {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Password salah!")
+            builder.setPositiveButton("Oke") { _,_ -> }
+            builder.show()
+        }
     }
 
     private fun restartActivity() {

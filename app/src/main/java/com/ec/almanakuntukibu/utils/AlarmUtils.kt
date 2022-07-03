@@ -26,8 +26,6 @@ class AlarmUtils(context: Context): ContextWrapper(context) {
 
         if (date.timeInMillis < Date().time) date.add(Calendar.DATE, 1)
 
-        Log.v("tgl", date.time.toString())
-
         val result = db.getAlarm()
         if (result != null) {
             if (!result.moveToFirst()) {
