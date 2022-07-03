@@ -184,9 +184,10 @@ class NifasActivity: BaseActivity() {
                             clnd.set(getDatePart("yyyy", tempDate), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime), 0)
                             val text = dtFormatter(clnd.time)
 
-                            if (!visit.status && (clnd.timeInMillis > Date().time || !result.moveToNext()) && !alarmSet) {
-                                val upcoming = if (count != 0 && !visits[weekBefore].status) count-1 else count
-                                val alarm = if (count != 0 && !visits[weekBefore].status) clndBefore else clnd
+                            val isLast = !result.moveToNext()
+                            if (!visit.status && (clnd.timeInMillis > Date().time || isLast) && !alarmSet) {
+                                val upcoming = if (count != 0 && !isLast && !visits[weekBefore].status) count-1 else count
+                                val alarm = if (count != 0 && !isLast && !visits[weekBefore].status) clndBefore else clnd
                                 alarmTime.set(alarm.get(Calendar.YEAR), alarm.get(Calendar.MONTH), alarm.get(Calendar.DATE), alarm.get(Calendar.HOUR_OF_DAY), alarm.get(Calendar.MINUTE), 0)
                                 alarmVisit = upcoming+1
                                 alarmSet = true
