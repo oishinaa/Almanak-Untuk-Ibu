@@ -6,17 +6,18 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.ec.almanakuntukibu.tracker.ServiceTracker
 import com.ec.almanakuntukibu.controller.kehamilan.HplActivity
 import com.ec.almanakuntukibu.controller.nifas.HlActivity
 import com.ec.almanakuntukibu.controller.siklus.SiklusActivity
+import com.ec.almanakuntukibu.tracker.ServiceTracker
 import com.google.android.material.button.MaterialButton
 
 class MainActivity: BaseActivity() {
     private lateinit var btnSiklus: MaterialButton
     private lateinit var btnKehamilan: MaterialButton
     private lateinit var btnMasaNifas: MaterialButton
-    private var db = DBHelper(this, null)
+
+    private val db = DBHelper(this, null)
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         loadBtn()
@@ -33,6 +34,7 @@ class MainActivity: BaseActivity() {
         btnKehamilan = findViewById(R.id.btnKehamilan)
         btnMasaNifas = findViewById(R.id.btnMasaNifas)
 
+        ServiceTracker().actionOnService(this, "start")
         loadBtn()
     }
 
@@ -64,7 +66,12 @@ class MainActivity: BaseActivity() {
                     }
                 } else if (result.getInt(result.getColumnIndex(DBHelper.user_hl)) != 0) {
                     btnKehamilan.setBackgroundColor(ContextCompat.getColor(this, R.color.dark))
-                    btnKehamilan.setOnClickListener { }
+                    btnKehamilan.setOnClickListener {
+                        val builder = AlertDialog.Builder(this)
+                        builder.setMessage("Pemantauan masa nifas sedang berlangsung.")
+                        builder.setPositiveButton("Ok") { _,_ -> }
+                        builder.show()
+                    }
                 }
             }
         }

@@ -12,8 +12,9 @@
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/drawable/ic_eye_hide.xml" value="0.203" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/drawable/ic_eye_show.xml" value="0.203" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/drawable/ic_snooze.xml" value="0.1605" />
-        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_greeting.xml" value="0.18125" />
-        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_hl.xml" value="0.184375" />
+        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/drawable/ic_water_drop.xml" value="0.1605" />
+        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_greeting.xml" value="0.22" />
+        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_hl.xml" value="0.22" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_hl_form.xml" value="0.22" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_hpl.xml" value="0.25" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_hpl_form.xml" value="0.22" />
@@ -21,7 +22,8 @@
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_nifas.xml" value="0.184375" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_siklus.xml" value="0.25" />
-        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_splash_screen.xml" value="0.75" />
+        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_siklus_form.xml" value="0.18541666666666667" />
+        <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/activity_splash_screen.xml" value="0.22" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/calendar_day.xml" value="0.18802083333333333" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/dialog_buat_alarm.xml" value="0.33" />
         <entry key="..\:/Documents/Work/Other/almanak/AlmanakUntukIbu/app/src/main/res/layout/dialog_isi_password.xml" value="0.25" />

@@ -68,11 +68,11 @@ class HplActivity: BaseActivity() {
                 txtYear.text = SimpleDateFormat("yyyy", Locale.UK).format(date)
 
                 val hpht = Calendar.getInstance()
-                hpht.set(getDatePart("yyyy", date), getDatePart("MM", date)-1, getDatePart("dd", date))
+                hpht.set(getDatePart("yyyy", date), getDatePart("MM", date)-1, getDatePart("dd", date), 0, 0, 0)
                 hpht.add(Calendar.MONTH, -9)
                 hpht.add(Calendar.DATE, -7)
 
-                val dateDiff = kotlin.math.abs(Date().time - hpht.timeInMillis) / (24 * 60 * 60 * 1000)
+                val dateDiff = (Date().time/1000 - hpht.timeInMillis/1000) / (24 * 60 * 60)
                 val week = ((dateDiff / 7) + 1).toString()
                 val info = "Sekarang anda berada di minggu ke-$week kehamilan"
                 txtInfo.text = info

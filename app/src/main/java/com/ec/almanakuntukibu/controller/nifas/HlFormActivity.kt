@@ -20,7 +20,7 @@ class HlFormActivity: BaseActivity() {
     private val db = DBHelper(this, null)
 
     private val onHlSetListener = DatePickerDialog.OnDateSetListener { _, year, month, day ->
-        date.set(year, month, day)
+        date.set(year, month, day, 0, 0, 0)
         txtHl.text = dpFormatter(date.time)
         btn.visibility = View.VISIBLE
     }
@@ -37,7 +37,9 @@ class HlFormActivity: BaseActivity() {
         txtHl = findViewById(R.id.txtHl)
         btn = findViewById(R.id.btn)
 
-        lnlHl.setOnClickListener { showDatePickerDialog(onHlSetListener, null) }
+        val min = Calendar.getInstance()
+        min.add(Calendar.DATE, -41)
+        lnlHl.setOnClickListener { showDatePickerDialog(onHlSetListener, null, min, Calendar.getInstance()) }
         btn.setOnClickListener{ submit() }
     }
 
@@ -47,6 +49,7 @@ class HlFormActivity: BaseActivity() {
             if (!result.moveToFirst()) db.addUser("hl", dbFormatter.format(date.time).toInt())
             else db.updUser("hl", dbFormatter.format(date.time).toInt())
         }
+        db.updUser("res", dbFormatter.format(date.time).toInt())
         finish()
     }
 }

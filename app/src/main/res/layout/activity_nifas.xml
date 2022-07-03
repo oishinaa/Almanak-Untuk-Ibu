@@ -20,13 +20,14 @@
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_gravity="end"
+            android:layout_gravity="end|center_vertical"
             android:layout_margin="10dp"
             android:padding="10dp"
             android:background="@drawable/bg_circle_pink"
             app:tint="@color/ic_white"
             android:elevation="2.5dp"
-            android:src="@drawable/ic_notification" />
+            android:src="@drawable/ic_notification"
+            android:id="@+id/btnAdd" />
 
     </FrameLayout>
 

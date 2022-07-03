@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pink"
+    android:background="@color/white"
     tools:context=".controller.splash.GreetingActivity">
 
     <LinearLayout
@@ -12,21 +12,10 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="50sp"
-            android:textColor="@color/white"
-            android:textAlignment="center"
-            android:fontFamily="serif"
-            android:gravity="center_horizontal"
-            android:text="Sugeng\nRawuh" />
-
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/pray" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/img_greetings" />
 
     </LinearLayout>
 

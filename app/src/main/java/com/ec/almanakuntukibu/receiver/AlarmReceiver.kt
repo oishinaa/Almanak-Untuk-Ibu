@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.ec.almanakuntukibu.utils.NotificationUtils
 import com.ec.almanakuntukibu.tracker.AudioTracker
+import com.ec.almanakuntukibu.utils.AlarmUtils
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -14,10 +15,10 @@ class AlarmReceiver: BroadcastReceiver() {
 
         val type = intent.getStringExtra("type")
         val text = intent.getStringExtra("text")
-        val notificationUtils = NotificationUtils(context)
-        val notification = notificationUtils.getNotificationBuilder(type!!, text!!).build()
-        notificationUtils.getManager().notify(2, notification)
+        val notification = NotificationUtils(context).getAlarmNotifBuilder(type!!, text!!).build()
+        NotificationUtils(context).getManager().notify(2, notification)
+        AlarmUtils(context).snoozeAlarm(type, text)
 
-        Timer().schedule(timerTask { AudioTracker.getMediaPlayerInstance().stopAudio() }, 30 * 1000)
+        Timer().schedule(timerTask { AudioTracker.getMediaPlayerInstance().stopAudio() }, 60 * 1000)
     }
 }

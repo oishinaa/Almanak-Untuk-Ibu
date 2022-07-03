@@ -27,9 +27,11 @@ open class BaseActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun showDatePickerDialog(onDateSetListener: DatePickerDialog.OnDateSetListener, date: Calendar?) {
+    fun showDatePickerDialog(onDateSetListener: DatePickerDialog.OnDateSetListener, date: Calendar?, min: Calendar?, max: Calendar?) {
         val c = date ?: Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(this, onDateSetListener, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
+        if (min != null) datePickerDialog.datePicker.minDate = min.timeInMillis
+        if (max != null) datePickerDialog.datePicker.maxDate = max.timeInMillis
         datePickerDialog.show()
     }
 

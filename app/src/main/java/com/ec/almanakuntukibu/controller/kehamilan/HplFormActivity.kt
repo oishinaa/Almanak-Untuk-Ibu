@@ -25,13 +25,13 @@ class HplFormActivity: BaseActivity() {
     private val db = DBHelper(this, null)
 
     private val onHplSetListener = DatePickerDialog.OnDateSetListener { _, year, month, day ->
-        date.set(year, month, day)
+        date.set(year, month, day, 0, 0, 0)
         txtHpl.text = dpFormatter(date.time)
         btn.visibility = View.VISIBLE
     }
 
     private val onHphtSetListener = DatePickerDialog.OnDateSetListener { _, year, month, day ->
-        date.set(year, month, day)
+        date.set(year, month, day, 0, 0, 0)
         txtHpht.text = dpFormatter(date.time)
         btn.visibility = View.VISIBLE
     }
@@ -56,8 +56,12 @@ class HplFormActivity: BaseActivity() {
 
         btnSudahTauHpl.setOnClickListener { toggleBtnSudah() }
         btnBelumTauHpl.setOnClickListener { toggleBtnBelum() }
-        lnlHpl.setOnClickListener { showDatePickerDialog(onHplSetListener, null) }
-        lnlHpht.setOnClickListener { showDatePickerDialog(onHphtSetListener, date) }
+        lnlHpl.setOnClickListener { showDatePickerDialog(onHplSetListener, null, Calendar.getInstance(), null) }
+        lnlHpht.setOnClickListener {
+            val min = Calendar.getInstance()
+            min.add(Calendar.DATE, -7*45+1)
+            showDatePickerDialog(onHphtSetListener, date, min, Calendar.getInstance())
+        }
         btn.setOnClickListener{ submit() }
     }
 
@@ -67,7 +71,7 @@ class HplFormActivity: BaseActivity() {
         if (result != null) {
             if (result.moveToFirst()) {
                 val tempDate = dbFormatter.parse(result.getInt(result.getColumnIndex(DBHelper.cycle_sta)).toString())
-                date.set(getDatePart("yyyy", tempDate!!), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate))
+                date.set(getDatePart("yyyy", tempDate!!), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), 0, 0, 0)
                 txtHpht.text = dpFormatter(date.time)
             }
         }
@@ -105,16 +109,17 @@ class HplFormActivity: BaseActivity() {
             if (!result.moveToFirst()) db.addUser("hpl", dbFormatter.format(date.time).toInt())
             else db.updUser("hpl", dbFormatter.format(date.time).toInt())
         }
+        date.add(Calendar.MONTH, -9)
+        date.add(Calendar.DATE, -7)
+        db.updUser("res", dbFormatter.format(date.time).toInt())
         addVisits()
     }
 
     private fun addVisits() {
         val weeks = arrayOf(13, 17, 21, 25, 31, 37)
-        date.add(Calendar.MONTH, -9)
-        date.add(Calendar.DATE, -7)
         for (w in weeks) {
             val visitDate = Calendar.getInstance()
-            visitDate.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE))
+            visitDate.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE), 0, 0, 0)
             visitDate.add(Calendar.DATE, (w-1)*7)
             db.addVisit(1, dbFormatter.format(visitDate.time).toInt(), "07:00", "", 0)
         }

@@ -17,6 +17,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         const val user_id = "id"
         const val user_hpl = "hpl"
         const val user_hl = "hl"
+        const val user_res = "res"
 
         const val cycles = "cycles"
         const val cycle_id = "id"
@@ -41,14 +42,15 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
         db.execSQL("DROP TABLE IF EXISTS $user")
         val qUser = ("CREATE TABLE $user (" +
             "$user_id INTEGER PRIMARY KEY, " +
-            "$user_hpl INTEGER," +
-            "$user_hl INTEGER" + ")")
+            "$user_hpl INTEGER, " +
+            "$user_hl INTEGER, " +
+            "$user_res INTEGER" + ")")
         db.execSQL(qUser)
 
         db.execSQL("DROP TABLE IF EXISTS $cycles")
         val qCycles = ("CREATE TABLE $cycles (" +
             "$cycle_id INTEGER PRIMARY KEY, " +
-            "$cycle_sta INTEGER," +
+            "$cycle_sta INTEGER, " +
             "$cycle_end INTEGER" + ")")
         db.execSQL(qCycles)
 
@@ -85,8 +87,10 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     fun addUser(col: String, value: Int) {
         val db = this.readableDatabase
         val values = ContentValues()
-        values.put(if (col == "hpl") user_hpl else user_hl, value)
-        values.put(if (col == "hpl") user_hl else user_hpl, 0)
+        values.put(user_hpl, 0)
+        values.put(user_hl, 0)
+        values.put(user_res, 0)
+        values.put(if (col == "hpl") user_hpl else if (col == "hl") user_hl else user_res, value)
         db.insert(user, null, values)
         db.close()
     }
@@ -94,14 +98,14 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?) :
     fun updUser(col: String, value: Int) {
         val db = this.readableDatabase
         val values = ContentValues()
-        values.put(if (col == "hpl") user_hpl else user_hl, value)
+        values.put(if (col == "hpl") user_hpl else if (col == "hl") user_hl else user_res, value)
         db.update(user, values, "$user_id = ?", Array(1) { "1" })
         db.close()
     }
 
     fun getAlarm(): Cursor? {
         val db = this.readableDatabase
-        return db.rawQuery("SELECT * FROM $alarm", null)
+          return db.rawQuery("SELECT * FROM $alarm", null)
     }
 
     fun addAlarm(date: Int, time: String) {

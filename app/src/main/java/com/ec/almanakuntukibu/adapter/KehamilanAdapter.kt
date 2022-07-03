@@ -2,9 +2,7 @@ package com.ec.almanakuntukibu.adapter
 
 import android.app.*
 import android.content.Context
-import android.content.Context.*
 import android.content.Intent
-import android.os.Build
 import android.text.Editable
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
@@ -14,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.ec.almanakuntukibu.receiver.AlarmReceiver
 import com.ec.almanakuntukibu.DBHelper
 import com.ec.almanakuntukibu.R
 import com.ec.almanakuntukibu.model.VisitModel
@@ -22,8 +19,7 @@ import com.ec.almanakuntukibu.controller.kehamilan.KehamilanActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<VisitModel>) :
+class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<VisitModel>, private var hpht: Calendar) :
     RecyclerView.Adapter<KehamilanAdapter.ViewHolder>() {
 
     private lateinit var edtPassword: EditText
@@ -50,7 +46,7 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
     private val db = DBHelper(context, null)
 
     private val onTimeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-        date.set(_year, _month, _day, hour, minute)
+        date.set(_year, _month, _day, hour, minute, 0)
         txtDate.text = dtFormatter(date.time)
     }
 
@@ -83,8 +79,8 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
         holder.lnlBlankEnd.visibility = if (position+1 == items.size) View.VISIBLE else View.GONE
 
         if (item.desc != "") {
-            holder.txtKeterangan.setTextColor(ContextCompat.getColor(context, if (item.status) R.color.dark else R.color.ic_white))
-            holder.txtKeterangan.background = ContextCompat.getDrawable(context, if (item.status) R.drawable.bg_corner_grey else R.drawable.bg_corner_pink)
+            holder.txtKeterangan.setTextColor(ContextCompat.getColor(context, if (item.status) R.color.ic_white else R.color.dark))
+            holder.txtKeterangan.background = ContextCompat.getDrawable(context, if (item.status) R.drawable.bg_corner_pink else R.drawable.bg_corner_grey)
             holder.txtKeterangan.setOnClickListener {
                 val dialogLayout = LayoutInflater.from(context).inflate(R.layout.dialog_isi_password, null)
                 edtPassword = dialogLayout.findViewById(R.id.edtPassword)
@@ -113,11 +109,11 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
     }
 
     private fun submitPassword(text: String, id: Int, visit_date: Int, visit_time: String, visit_notes: String, visit_status: Boolean) {
-        if (text == "bidannganjuk") {
+        if (text == "nganjukbangkit") {
             val tempDate = dbFormatter.parse(visit_date.toString())
             val tempTime = tmFormatter.parse(visit_time)
             date = Calendar.getInstance()
-            date.set(getDatePart("yyyy", tempDate!!), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime))
+            date.set(getDatePart("yyyy", tempDate!!), getDatePart("MM", tempDate)-1, getDatePart("dd", tempDate), getDatePart("HH", tempTime!!), getDatePart("mm", tempTime), 0)
 
             val dialogLayout = LayoutInflater.from(context).inflate(R.layout.dialog_buat_alarm, null)
             lnlDate = dialogLayout.findViewById(R.id.lnlDate)
@@ -152,6 +148,11 @@ class KehamilanAdapter(context: KehamilanActivity, private var items: ArrayList<
 
     private fun showDatePickerDialog(onDateSetListener: DatePickerDialog.OnDateSetListener) {
         val datePickerDialog = DatePickerDialog(context, onDateSetListener, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
+        datePickerDialog.datePicker.minDate = hpht.timeInMillis
+        val max = Calendar.getInstance()
+        max.set(hpht.get(Calendar.YEAR), hpht.get(Calendar.MONTH), hpht.get(Calendar.DATE), 0, 0, 0)
+        max.add(Calendar.DATE, 7*45-1)
+        datePickerDialog.datePicker.maxDate = max.timeInMillis
         datePickerDialog.show()
     }
 

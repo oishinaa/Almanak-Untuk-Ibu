@@ -23,11 +23,12 @@ class AudioTracker {
         }
         // alarmUri = Uri.parse("android.resource://" + context.packageName + "/" + R.raw.message_tone_meloboom)
 
+        stopAudio()
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer()
+            mediaPlayer?.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
+            mediaPlayer?.setDataSource(context, alarmUri)
         }
-        mediaPlayer?.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
-        mediaPlayer?.setDataSource(context, alarmUri)
         mediaPlayer?.isLooping = true
         mediaPlayer?.prepare()
         mediaPlayer?.start()
