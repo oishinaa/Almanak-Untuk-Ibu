@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Almanak Untuk Ibu</string>
+    <string name="app_name">Almanak Untuk Wanita</string>
 
     <style name="circleImageView" parent="">
         <item name="cornerFamily">rounded</item>
